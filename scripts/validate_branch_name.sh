@@ -23,7 +23,13 @@ IFS="|"
 regex="^($main|$develop|(${prefixes[*]})\/$suffix)$"
 unset IFS
 
-branch_name=$(git symbolic-ref --short HEAD)
+if [ -n "$GITHUB_HEAD_REF" ]; then
+    branch_name="$GITHUB_HEAD_REF"
+elif [ -n "$GITHUB_REF" ]; then
+    branch_name="${GITHUB_REF#refs/heads/}"
+else
+    branch_name=$(git symbolic-ref --short HEAD)
+fi
 
 if [[ ! $branch_name =~ $regex ]]; then
     echo "--------------------------------------------------------------------------------"
