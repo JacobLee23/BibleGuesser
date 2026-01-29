@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
-mvn package
-find target/ -name "*.jar" | tac | xargs java -jar
-mvn clean
+DIRECTORY="target/"
+if [ ! -d "$DIRECTORY" ]; then
+    mvn package
+fi
+
+FILENAME="bibleguesser-*.*.*.jar"
+JARFILE=$(find "$DIRECTORY" -name "$FILENAME" | tac | head -n 1)
+
+java -jar "$JARFILE"
