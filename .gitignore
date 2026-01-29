@@ -1,3 +1,4 @@
 target/
 
 *.jar
+dependency-reduced-pom.xml
