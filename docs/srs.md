@@ -107,6 +107,32 @@ Changes to these assumptions or dependencies may require revisions to the system
 
 ### 3.1 Functional Requirements
 
+#### 3.1.1 Scripture Parsing
+
+##### FR-PARSE-001
+
+*Testament Divisions of the Biblical Canon*. The system shall divide the Biblical canon into the following testament divisions:
+
+- **Old Testament**: Genesis, Exodus, Leviticus, Numbers, Deuteronomy, Joshua, Judges, Ruth, 1 Samuel, 2 Samuel, 1 Kings, 2 Kings, 1 Chronicles, 2 Chronicles, Ezra, Nehemiah, Esther, Job, Psalms, Proverbs, Ecclesiastes, Song of Solomon, Isaiah, Jeremiah, Lamentations, Ezekiel, Daniel, Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi
+- **New Testament**: Matthew, Mark, Luke, John, Acts, Romans, 1 Corinthians, 2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1 Thessalonians, 2 Thessalonians, 1 Timothy, 2 Timothy, Titus, Philemon, Hebrews, James, 1 Peter, 2 Peter, 1 John, 2 John, 3 John, Jude, Revelation
+
+##### FR-PARSE-002
+
+*Genre Subdivisions of the Biblical Canon*. The system shall divide each testament of the Biblical canon into the following genre subdivisions:
+
+- **Old Testament**
+    - **Law**: Genesis, Exodus, Leviticus, Numbers, Deuteronomy
+    - **Historical Narrative**: Joshua, Judges, Ruth, 1 Samuel, 2 Samuel, 1 Kings, 2 Kings, 1 Chronicles, 2 Chronicles, Ezra, Nehemiah, Esther
+    - **Wisdom and Poetry**: Job, Psalms, Proverbs, Ecclesiastes, Song of Solomon
+    - **Major Prophets**: Isaiah, Jeremiah, Lamentations, Ezekiel, Daniel
+    - **Minor Prophets**: Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi
+- **New Testament**
+    - **Gospel Accounts**: Matthew, Mark, Luke, John
+    - **Early Church History**: Acts
+    - **Pauline Epistles**: Romans, 1 Corinthians, 2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1 Thessalonians, 2 Thessalonians, 1 Timothy, 2 Timothy, Titus, Philemon
+    - **General Epistles**: Hebrews, James, 1 Peter, 2 Peter, 1 John, 2 John, 3 John, Jude
+    - **Apocalyptic Literature**: Revelation
+
 ### 3.2 Non-Functional Requirements
 
 #### 3.2.1 Performance
