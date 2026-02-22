@@ -1,4 +1,4 @@
-package io.github.jacoblee23.bibleguesser.canon;
+package io.github.jacoblee23.bibleguesser.scriptures;
 
 import java.util.Arrays;
 import java.util.List;
