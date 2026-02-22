@@ -1,5 +1,6 @@
-package io.github.jacoblee23.bibleguesser.canon;
+package io.github.jacoblee23.bibleguesser.scriptures;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -19,10 +20,12 @@ public class Canon {
     private final Map<String, Map<String, List<String>>> data;
 
     private Canon() {
-        InputStream in = getClass().getResourceAsStream(Canon.PATH);
-        Yaml yaml = new Yaml();
-
-        this.data = new LinkedHashMap<>(yaml.load(in));
+        try (InputStream in = getClass().getResourceAsStream(Canon.PATH)) {
+            Yaml yaml = new Yaml();
+            this.data = new LinkedHashMap<>(yaml.load(in));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to configure record of the Biblical canon");
+        }
     }
 
     @Override

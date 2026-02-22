@@ -1,4 +1,4 @@
-package io.github.jacoblee23.bibleguesser.canon;
+package io.github.jacoblee23.bibleguesser.scriptures;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 
-public class CanonTest {
+public class CanonTests {
     @Test
     void testGetTestaments() {
         Canon canon = Canon.getInstance();
