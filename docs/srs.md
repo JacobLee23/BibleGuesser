@@ -111,14 +111,14 @@ Changes to these assumptions or dependencies may require revisions to the system
 
 ##### FR-PARSE-001
 
-*Testament Divisions of the Biblical Canon*. The system shall divide the Biblical canon into the following testament divisions:
+*Testament Divisions of the Biblical Canon*. The system shall recognize the following testament divisions of the Biblical canon:
 
 - **Old Testament**: Genesis, Exodus, Leviticus, Numbers, Deuteronomy, Joshua, Judges, Ruth, 1 Samuel, 2 Samuel, 1 Kings, 2 Kings, 1 Chronicles, 2 Chronicles, Ezra, Nehemiah, Esther, Job, Psalms, Proverbs, Ecclesiastes, Song of Solomon, Isaiah, Jeremiah, Lamentations, Ezekiel, Daniel, Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi
 - **New Testament**: Matthew, Mark, Luke, John, Acts, Romans, 1 Corinthians, 2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1 Thessalonians, 2 Thessalonians, 1 Timothy, 2 Timothy, Titus, Philemon, Hebrews, James, 1 Peter, 2 Peter, 1 John, 2 John, 3 John, Jude, Revelation
 
 ##### FR-PARSE-002
 
-*Genre Subdivisions of the Biblical Canon*. The system shall divide each testament of the Biblical canon into the following genre subdivisions:
+*Genre Subdivisions of the Biblical Canon*. The system shall recognize the following genre subdivisions of each testament of the Biblical canon:
 
 - **Old Testament**
     - **Law**: Genesis, Exodus, Leviticus, Numbers, Deuteronomy
@@ -132,6 +132,51 @@ Changes to these assumptions or dependencies may require revisions to the system
     - **Pauline Epistles**: Romans, 1 Corinthians, 2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1 Thessalonians, 2 Thessalonians, 1 Timothy, 2 Timothy, Titus, Philemon
     - **General Epistles**: Hebrews, James, 1 Peter, 2 Peter, 1 John, 2 John, 3 John, Jude
     - **Apocalyptic Literature**: Revelation
+
+##### FR-PARSE-003
+
+*Bible Translations*. The system shall support parsing of the following translations of the Bible:
+
+| Abbreviation | Name |
+| :--- | :--- |
+| AKJV | American King James Version |
+| AMP | Amplified Bible |
+| ASV | American Standard Version |
+| BSB | Berean Standard Bible |
+| CPDV | Catholic Public Domain Version |
+| DBT | Derby Bible Translation |
+| DRB | Douay-Rheims Bible |
+| ERV | English Revised Version |
+| ESV | English Standard Version |
+| JPS | JPS Tanakh |
+| KJV | King James Version |
+| NASB | New American Standard Bible |
+| NET | New English Translation |
+| SLT | Smith's Literal Translation |
+| WBT | Webster Bible Translation |
+| WEB | World English Bible |
+| WEY | Weymouth New Testament |
+| YLT | Young's Literal Translation |
+
+##### FR-PARSE-004
+
+*Biblical Citation Format*. The system shall recognize the following formats for biblical citations:
+
+- Single chapter: `<BOOK> <CHAPTER>`
+- Range of chapters: `<BOOK> <CHAPTER_1>-<CHAPTER_2>`
+- Single verse: `<BOOK> <CHAPTER>:<VERSE>`
+- Range of verses: `<BOOK> <CHAPTER>:<VERSE_1>-<VERSE_2>`
+- Multiple disjoint verses: `<BOOK> <CHAPTER>:<VERSE_1>, <VERSE_2>`
+
+_Note_: The books of Obadiah, Philemon, 2 John, 3 John, and Jude comprise only a single chapter; while in many printed editions the chapter number is omitted for these books, with references using just the verse numbers, the system shall always include the chapter number in all references.
+
+##### FR-PARSE-005
+
+*Index-Based Verse Retrieval*. If the system is provided a valid zero-based index of a verse within Scripture, then the system shall be able to retrieve the reference and the text of the corresponding verse; if the system is provided with an invalid index, then the system shall enter an erroneous state.
+
+##### FR-PRASE-006
+
+*Citation-Baseed Verse Retrieval*. If the system is provided a valid biblical citation of a verse within Scripture, then the system shall be able to retrieve the text of the corresponding verse and its zero-based index within Scripture; if the system is provided with an invalid index, then the system shall enter an erroneous state.
 
 ### 3.2 Non-Functional Requirements
 
