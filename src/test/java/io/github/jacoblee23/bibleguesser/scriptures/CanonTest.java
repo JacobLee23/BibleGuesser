@@ -1,10 +1,12 @@
-package io.github.jacoblee23.bibleguesser.canon;
+package io.github.jacoblee23.bibleguesser.scriptures;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+
+import io.github.jacoblee23.bibleguesser.scriptures.Canon;
 
 
 public class CanonTest {
