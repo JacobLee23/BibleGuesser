@@ -1,5 +1,6 @@
 package io.github.jacoblee23.bibleguesser.scriptures;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -13,16 +14,19 @@ import org.yaml.snakeyaml.Yaml;
  * Interfaces for parsing the testament divisions and genre subdivisions of the Biblical canon.
  */
 public class Canon {
-    private static Canon instance = null;
     private static final String PATH = "/canon.yml";
+
+    private static Canon instance = null;
 
     private final Map<String, Map<String, List<String>>> data;
 
     private Canon() {
-        InputStream in = getClass().getResourceAsStream(Canon.PATH);
-        Yaml yaml = new Yaml();
-
-        this.data = new LinkedHashMap<>(yaml.load(in));
+        try (InputStream in = getClass().getResourceAsStream(Canon.PATH)) {
+            Yaml yaml = new Yaml();
+            this.data = new LinkedHashMap<>(yaml.load(in));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to configure record of Biblical canon");
+        }
     }
 
     @Override
@@ -41,11 +45,11 @@ public class Canon {
     }
 
     /**
-     * Retrieves the list of testament divisions that comprise the Biblical canon.
+     * Lists the testament divisions that comprise the Biblical canon.
      *
      * @return The testament divisions of the Biblical canon
      */
-    public List<String> getTestaments() {
+    public List<String> listTestaments() {
         List<String> testaments = new LinkedList<>();
         this.data.forEach((key, value) -> { testaments.add(key); });
 
@@ -53,13 +57,13 @@ public class Canon {
     }
 
     /**
-     * Retrieves the list of genre subdivisions that comprise a specified testament division of the
-     * Biblical canon.
+     * Lists the genre subdivisions that comprise a specified testament division of the Biblical
+     * canon.
      *
      * @param testament A testament division
      * @return The genre subdivisions that comprise the specified testament
      */
-    public List<String> getGenres(String testament) {
+    public List<String> listGenres(String testament) {
         List<String> genres = new LinkedList<>();
         this.data.get(testament).forEach((key, value) -> { genres.add(key); });
 
@@ -67,54 +71,53 @@ public class Canon {
     }
 
     /**
-     * Retrieves the list of genre subdivisions that comprise the Biblical canon.
+     * Lists the genre subdivisions that comprise the Biblical canon.
      *
      * @return The genre subdivisions that comprise the Biblical canon
      */
-    public List<String> getGenres() {
+    public List<String> listGenres() {
         List<String> genres = new LinkedList<>();
-        for (String testament : this.getTestaments()) {
-            genres.addAll(this.getGenres(testament));
+        for (String testament : this.listTestaments()) {
+            genres.addAll(this.listGenres(testament));
         }
         return genres;
     }
 
     /**
-     * Retrieves the list of books that comprise a specified genre subdivision of a specified
-     * testament division of the Biblical canon.
+     * Lists the books that comprise a specified genre subdivision of a specified testament division
+     * of the Biblical canon.
      *
      * @param testament A testament division
      * @param genre A genre subdivision
      * @return The books that comprise the specified genre of the specified testament
      */
-    public List<String> getBooks(String testament, String genre) {
+    public List<String> listBooks(String testament, String genre) {
         return this.data.get(testament).get(genre);
     }
 
     /**
-     * Retrieves the list of books that comprise a specified testament division of the Biblical
-     * canon.
+     * Lists the books that comprise a specified testament division of the Biblical canon.
      *
      * @param testament A testament division
      * @return The books that comprise the specified testament
      */
-    public List<String> getBooks(String testament) {
+    public List<String> listBooks(String testament) {
         List<String> books = new LinkedList<>();
-        for (String genre : this.getGenres(testament)) {
-            books.addAll(this.getBooks(testament, genre));
+        for (String genre : this.listGenres(testament)) {
+            books.addAll(this.listBooks(testament, genre));
         }
         return books;
     }
 
     /**
-     * Retrieves the list of books that comprise the Biblical canon.
+     * Lists the books that comprise the Biblical canon.
      *
      * @return The books that comprise the Biblical canon
      */
-    public List<String> getBooks() {
+    public List<String> listBooks() {
         List<String> books = new LinkedList<>();
-        for (String testament : this.getTestaments()) {
-            books.addAll(this.getBooks(testament));
+        for (String testament : this.listTestaments()) {
+            books.addAll(this.listBooks(testament));
         }
         return books;
     }
