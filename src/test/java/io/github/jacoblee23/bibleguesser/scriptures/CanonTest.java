@@ -6,20 +6,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
-import io.github.jacoblee23.bibleguesser.scriptures.Canon;
-
 
 public class CanonTest {
     @Test
-    void testGetTestaments() {
+    void testListTestaments() {
         Canon canon = Canon.getInstance();
 
         List<String> testaments = Arrays.asList("Old Testament", "New Testament");        
-        assertEquals(testaments, canon.getTestaments());
+        assertEquals(testaments, canon.listTestaments());
     }
 
     @Test
-    void testGetGenres() {
+    void testListGenres() {
         Canon canon = Canon.getInstance();
 
         List<String> genres = Arrays.asList(
@@ -37,11 +35,11 @@ public class CanonTest {
             "General Epistles",
             "Apocalyptic Literature"
         );
-        assertEquals(genres, canon.getGenres());
+        assertEquals(genres, canon.listGenres());
     }
 
     @Test
-    void testGetBooks() {
+    void testListBooks() {
         Canon canon = Canon.getInstance();
 
         List<String> books = Arrays.asList(
@@ -83,6 +81,6 @@ public class CanonTest {
             // Apocalyptic Literature
             "Revelation"
         );
-        assertEquals(books, canon.getBooks());
+        assertEquals(books, canon.listBooks());
     }
 }
