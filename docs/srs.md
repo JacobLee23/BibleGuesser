@@ -140,7 +140,7 @@ Changes to these assumptions or dependencies may require revisions to the system
 | Abbreviation | Name |
 | :--- | :--- |
 | AKJV | American King James Version |
-| AMP | Amplified Bible |
+| AMPC | Amplified Bible, Classic Edition |
 | ASV | American Standard Version |
 | BSB | Berean Standard Bible |
 | CPDV | Catholic Public Domain Version |
