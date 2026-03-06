@@ -80,7 +80,7 @@ public class Translations {
      */
     public static enum Translation {
         AKJV("AKJV"),
-        AMP("AMP"),
+        AMPC("AMPC"),
         ASV("ASV"),
         BSB("BSB"),
         CPDV("CPDV"),
