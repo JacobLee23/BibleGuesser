@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -117,5 +118,14 @@ public class Canon {
             books.addAll(this.listBooks(testament));
         }
         return books;
+    }
+
+    public String normalizeBook(String name, Function<String, String> fn) {
+        for (String book : this.listBooks()) {
+            if (fn.apply(book).equals(name)) {
+                return book;
+            }
+        }
+        return null;
     }
 }
