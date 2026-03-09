@@ -29,9 +29,6 @@ public class Canon {
         }
     }
 
-    @Override
-    public String toString() { return this.data.toString(); }
-
     /**
      * Global access point to the class singleton.
      *
