@@ -58,6 +58,14 @@ public class Corpus {
         return corpus;
     }
 
+    private static Pattern getLineRegEx(Translations.Translation translation) {
+        return switch (translation) {
+            case AKJV, ASV, BSB, CPDV, DBT, DRB, ERV, JPS, KJV, SLT, WBT, WEB, WEY, YLT -> Corpus.REGEX_A;
+            case AMPC, NASB, NET -> Corpus.REGEX_B;
+            case ESV -> Corpus.REGEX_C;
+        };
+    }
+
     /**
      * Retrieves the Bible translation corresponding to the corpus.
      *
@@ -222,16 +230,11 @@ public class Corpus {
 
     private void parseText() {
         Canon canon = Canon.getInstance();
-        Abbreviations abbreviations = Abbreviations.getInstance();
         Translations translations = Translations.getInstance();
-
-        Map<String, String> lowercase = new HashMap<>();
 
         this.counts.clear();
         this.linenos.clear();
         for (String book : canon.listBooks()) {
-            lowercase.put(book.toLowerCase(), book);
-
             this.counts.put(book, new HashMap<>());
             this.linenos.put(book, new HashMap<>());
         }
@@ -247,102 +250,48 @@ public class Corpus {
             while ((line = buffer.readLine()) != null) {
                 lineno += 1;
 
-                Pattern regex = switch (this.translation) {
-                    case AKJV, ASV, BSB, CPDV, DBT, DRB, ERV, JPS, KJV, SLT, WBT, WEB, WEY, YLT -> Corpus.REGEX_A;
-                    case AMPC, NASB, NET -> Corpus.REGEX_B;
-                    case ESV -> Corpus.REGEX_C;
-                };
-                Matcher match = regex.matcher(line);
-                if (!match.matches()) {
+                Matcher match = this.parseLine(line);
+                if (match == null) {
                     continue;
                 }
 
-                String book;
-                int chapter;
-                int verse;
-                switch (this.translation) {
-                    case AKJV, ASV, BSB, CPDV, DBT, DRB, ERV, JPS, KJV, SLT, WBT, WEB, WEY, YLT -> {
-                        book = match.group(1);
-                        if (book.isEmpty()) {
-                            throw new IllegalStateException(
-                                String.format(
-                                    "[%s] Failed to parse reference from line: %s",
-                                    this.translation, line
-                                )
-                            );
-                        }
-                        if (book.equals("Psalm")) {
-                            book = "Psalms";
-                        }
-                        chapter = Integer.parseInt(match.group(2));
-                        verse = Integer.parseInt(match.group(3));
-                    }
-                    case AMPC, NASB, NET -> {
-                        book = match.group(2);
-                        if (book.isEmpty()) {
-                            throw new IllegalStateException(
-                                String.format(
-                                    "[%s] Failed to parse reference from line: %s",
-                                    this.translation, line
-                                )
-                            );
-                        }
-                        if (book.equals("psalm")) {
-                            book = "psalms";
-                        }
-                        book = lowercase.get(book);
-                        chapter = Integer.parseInt(match.group(3));
-                        verse = Integer.parseInt(match.group(4));
-                    }
-                    case ESV -> {
-                        book = match.group(1);
-                        if (book.isEmpty()) {
-                            throw new IllegalStateException(
-                                String.format(
-                                    "[%s] Failed to parse reference from line: %s",
-                                    this.translation, line
-                                )
-                            );
-                        }
-                        book = abbreviations.decode(
-                            Abbreviations.System.BIBLICA, book.toUpperCase()
-                        );
-                        if (book == null) {
-                            throw new IllegalStateException(
-                                String.format(
-                                    "[%s] Failed to parse reference from line: %s",
-                                    this.translation, line
-                                )
-                            );
-                        }
-                        chapter = Integer.parseInt(match.group(2));
-                        verse = Integer.parseInt(match.group(3));
-                    }
-                    default -> {
-                        throw new IllegalArgumentException(
-                            String.format("Unknown Bible translation: %s", this.translation)
-                        );
-                    }
+                Citation citation;
+                try {
+                    citation = this.extractCitation(match);
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalStateException(
+                        String.format(
+                            "[%s] Failed to extract citation from line: %s", this.translation, line
+                        )
+                    );
                 }
 
                 // Record length of chapter
-                Map<Integer, Integer> chapterCounts = this.counts.get(book);
+                Map<Integer, Integer> chapterCounts = this.counts.get(citation.getBook());
                 if (chapterCounts == null) {
                     throw new IllegalArgumentException(
-                        String.format("[%s] Unknown book: %s", this.translation, book)
+                        String.format(
+                            "[%s] Invalid book contained in citation: %s",
+                            this.translation,
+                            citation
+                        )
                     );
                 }
-                chapterCounts.put(chapter, verse);
+                chapterCounts.put(citation.getChapter(), citation.getVerse());
 
                 // Record line number of first verse of chapter
-                if (verse == 1) {
-                    Map<Integer, Integer> chapterLinenos = this.linenos.get(book);
+                if (citation.getVerse() == 1) {
+                    Map<Integer, Integer> chapterLinenos = this.linenos.get(citation.getBook());
                     if (chapterLinenos == null) {
                         throw new IllegalArgumentException(
-                            String.format("[%s] Unknown book: %s", this.translation, book)
+                            String.format(
+                                "[%s] Invalid book contained in citation: %s",
+                                this.translation,
+                                citation
+                            )
                         );
                     }
-                    chapterLinenos.put(chapter, lineno);
+                    chapterLinenos.put(citation.getChapter(), lineno);
                 }
             }
         } catch (IOException e) {
@@ -350,5 +299,90 @@ public class Corpus {
                 String.format("[%s] Failed to parse corpus", this.translation)
             );
         }
+    }
+
+    private Matcher parseLine(String line) {
+        Pattern regex = Corpus.getLineRegEx(this.translation);
+        Matcher match = regex.matcher(line);
+        if (!match.matches()) {
+            return null;
+        }
+        return match;
+    }
+
+    private Citation extractCitation(Matcher match) {
+        Canon canon = Canon.getInstance();
+        Abbreviations abbreviations = Abbreviations.getInstance();
+
+        String book, chapter, verse;
+        switch (this.translation) {
+            case AKJV, ASV, BSB, CPDV, DBT, DRB, ERV, JPS, KJV, SLT, WBT, WEB, WEY, YLT -> {
+                book = match.group(1);
+                chapter = match.group(2);
+                verse = match.group(3);
+                if (book.isEmpty() || chapter.isEmpty() || verse.isEmpty()) {
+                    throw new IllegalArgumentException(
+                        String.format("Failed to extract citation: %s", match)
+                    );
+                }
+                if (book.equals("Psalm")) {
+                    book = "Psalms";
+                }
+            }
+            case AMPC, NASB, NET -> {
+                book = match.group(2);
+                chapter = match.group(3);
+                verse = match.group(4);
+                if (book.isEmpty() || chapter.isEmpty() || verse.isEmpty()) {
+                    throw new IllegalArgumentException(
+                        String.format("Failed to extract citation: %s", match)
+                    );
+                }
+                book = canon.normalizeBook(
+                    (book.equals("psalm") ? "psalms" : book), String::toLowerCase
+                );
+                if (book == null) {
+                    throw new IllegalArgumentException(
+                        String.format("Failed to extract citation: %s", match)
+                    );
+                }
+            }
+            case ESV -> {
+                book = match.group(1);
+                chapter = match.group(2);
+                verse = match.group(3);
+                if (book.isEmpty() || chapter.isEmpty() || verse.isEmpty()) {
+                    throw new IllegalArgumentException(
+                        String.format("Failed to extract citation: %s", match)
+                    );
+                }
+                book = abbreviations.decode(
+                    Abbreviations.System.BIBLICA, book.toUpperCase()
+                );
+                if (book == null) {
+                    throw new IllegalArgumentException(
+                        String.format("Failed to extract citation: %s", match)
+                    );
+                }
+            }
+            default -> {
+                throw new IllegalArgumentException(
+                    String.format("Invalid Bible translation: %s", this.translation)
+                );
+            }
+        }
+        return new Citation(book, Integer.parseInt(chapter), Integer.parseInt(verse));
+    }
+
+    private String extractText(Matcher match) {
+        String text = switch (this.translation) {
+            case AKJV, ASV, BSB, CPDV, DBT, DRB, ERV, JPS, KJV, SLT, WBT, WEB, WEY, YLT -> match.group(4);
+            case AMPC, NASB, NET -> match.group(1);
+            case ESV -> match.group(4);
+        };
+        if (text.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Failed to extract text: %s", match));
+        }
+        return text;
     }
 }
