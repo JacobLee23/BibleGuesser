@@ -160,13 +160,7 @@ Changes to these assumptions or dependencies may require revisions to the system
 
 ##### FR-PARSE-004
 
-*Biblical Citation Format*. The system shall recognize the following formats for biblical citations:
-
-- Single chapter: `<BOOK> <CHAPTER>`
-- Range of chapters: `<BOOK> <CHAPTER_1>-<CHAPTER_2>`
-- Single verse: `<BOOK> <CHAPTER>:<VERSE>`
-- Range of verses: `<BOOK> <CHAPTER>:<VERSE_1>-<VERSE_2>`
-- Multiple disjoint verses: `<BOOK> <CHAPTER>:<VERSE_1>, <VERSE_2>`
+*Biblical Citation Format*. The system shall recognize the following format of biblical citation: `<BOOK> <CHAPTER>:<VERSE>`.
 
 _Note_: The books of Obadiah, Philemon, 2 John, 3 John, and Jude comprise only a single chapter; while in many printed editions the chapter number is omitted for these books, with references using just the verse numbers, the system shall always include the chapter number in all references.
 
