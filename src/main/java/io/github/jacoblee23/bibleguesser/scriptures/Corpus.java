@@ -159,6 +159,67 @@ public class Corpus {
         return count;
     }
 
+    /**
+     * Retrieves the zero-based index of a verse within the Scriptures specified by its citation.
+     *
+     * @param citation The citation referencing a verse to index
+     * @return The index of the verse within the Scriptures
+     */
+    public int getIndex(Citation citation) {
+        if (!this.counts.containsKey(citation.getBook())) {
+            throw new IllegalArgumentException(
+                String.format("Invalid book contained in citation: %s", citation)
+            );
+        }
+        if (!this.counts.get(citation.getBook()).containsKey(citation.getChapter())) {
+            throw new IllegalArgumentException(
+                String.format("Invalid chapter number contained in citation: %s", citation)
+            );
+        }
+
+        int index = -1;
+        for (Map.Entry<String, Map<Integer, Integer>> bookEntry : this.counts.entrySet()) {
+            for (Map.Entry<Integer, Integer> chapterEntry : bookEntry.getValue().entrySet()) {
+                if (
+                    bookEntry.getKey().equals(citation.getBook())
+                    && chapterEntry.getKey().equals(citation.getChapter())
+                ) {
+                    if (citation.getVerse() <= this.nverses(bookEntry.getKey(), chapterEntry.getKey())) {
+                        return index + citation.getVerse();
+                    }
+                    throw new IllegalArgumentException(
+                        String.format("Invalid verse number contained in citation: %s", citation)
+                    );
+                }
+                index += chapterEntry.getValue();
+            }
+        }
+        throw new IllegalArgumentException(String.format("Invalid citation: %s", citation));
+    }
+
+    /**
+     * Retrieves the citation of a verse specified by its zero-based index within the Scriptures.
+     *
+     * @param index The zero-based index of a verse within the Scriptures
+     * @return The citation referencing the verse
+     */
+    public Citation getCitation(int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException(String.format("Invalid verse index: %d", index));
+        }
+        int count = index + 1;
+
+        for (Map.Entry<String, Map<Integer, Integer>> bookEntry : this.counts.entrySet()) {
+            for (Map.Entry<Integer, Integer> chapterEntry : bookEntry.getValue().entrySet()) {
+                if (count <= chapterEntry.getValue()) {
+                    return new Citation(bookEntry.getKey(), chapterEntry.getKey(), count);
+                }
+                count -= chapterEntry.getValue();
+            }
+        }
+        throw new IllegalArgumentException(String.format("Invalid verse index: %d", index));
+    }
+
     private void parseText() {
         Canon canon = Canon.getInstance();
         Abbreviations abbreviations = Abbreviations.getInstance();
@@ -286,9 +347,7 @@ public class Corpus {
             }
         } catch (IOException e) {
             throw new IllegalStateException(
-                String.format(
-                    "Failed to parse copy of %s translation", this.translation
-                )
+                String.format("[%s] Failed to parse corpus", this.translation)
             );
         }
     }
