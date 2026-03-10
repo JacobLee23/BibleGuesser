@@ -228,6 +228,32 @@ public class Corpus {
         throw new IllegalArgumentException(String.format("Invalid verse index: %d", index));
     }
 
+    /**
+     * Retrieves the text of a verse specified by its zero-based index within the Scriptures.
+     *
+     * @param index The zero-based index of a verse within the Scriptures
+     * @return The text of the verse
+     */
+    public String getText(int index) {
+        return this.getText(this.getCitation(index));
+    }
+
+    /**
+     * Retrieves the text of a verse specified by its citation.
+     *
+     * @param citation The citation referencing a verse to index
+     * @return The text of the verse
+     */
+    public String getText(Citation citation) {
+        String line = this.getLine(citation);
+        Matcher match = this.parseLine(line);
+        if (match == null) {
+            throw new IllegalArgumentException();
+        }
+
+        return this.extractText(match);
+    }
+
     private void parseText() {
         Canon canon = Canon.getInstance();
         Translations translations = Translations.getInstance();
@@ -384,5 +410,69 @@ public class Corpus {
             throw new IllegalArgumentException(String.format("Failed to extract text: %s", match));
         }
         return text;
+    }
+
+    private String getLine(Citation citation) {
+        Map<Integer, Integer> bookLinenos = this.linenos.get(citation.getBook());
+        if (bookLinenos == null) {
+            throw new IllegalArgumentException(
+                String.format("Invalid book contained in citation: %s", citation)
+            );
+        }
+
+        Integer chapterLineno = bookLinenos.get(citation.getChapter());
+        if (chapterLineno == null) {
+            throw new IllegalArgumentException(
+                String.format("Invalid chapter contained in citation: %s", citation)
+            );
+        }
+
+        Translations translations = Translations.getInstance();
+        String path = translations.getResourceName(this.translation);
+        try (
+            InputStream in = getClass().getResourceAsStream(path);
+            Reader reader = new InputStreamReader(in);
+            BufferedReader buffer = new BufferedReader(reader)
+        ) {
+            String line;
+            int lineno = 0;
+            while ((line = buffer.readLine()) != null) {
+                // Seek line of first verse in chapter within corpus
+                if (++lineno < chapterLineno) {
+                    continue;
+                }
+
+                Matcher match = this.parseLine(line);
+                if (match == null) {
+                    continue;
+                }
+
+                // Check if citation of current line matches target citation
+                if (this.extractCitation(match).equals(citation)) {
+                    if (this.translation != Translations.Translation.ESV) {
+                        return line;
+                    }
+
+                    // Text in copy of ESV translation may be broken across multiple lines
+                    String fragment;
+                    while ((fragment = buffer.readLine()) != null) {
+                        if (Corpus.REGEX_C.matcher(fragment).matches()) {
+                            break;
+                        }
+                        line = String.join(" ", line, fragment);
+                    }
+                    return line;
+                }
+            }
+            throw new IllegalStateException(
+                String.format(
+                    "[%s] Failed to find citation in corpus: %s", this.translation, citation
+                )
+            );
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                String.format("[%s] Failed to parse corpus", this.translation)
+            );
+        }
     }
 }
