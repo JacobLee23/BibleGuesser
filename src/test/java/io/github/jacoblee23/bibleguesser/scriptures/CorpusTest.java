@@ -1,8 +1,12 @@
 package io.github.jacoblee23.bibleguesser.scriptures;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 
 public class CorpusTest {
@@ -24,16 +28,50 @@ public class CorpusTest {
     // Total number of verses in New Testament of Biblical canon
     private static final int NVERSES_NT = 7957;
 
+    // Indices of bookend verses of the Bible
+    private static final int IDX_OTSTART = 0;
+    private static final int IDX_OTEND = CorpusTest.NVERSES_OT - 1;
+    private static final int IDX_NTSTART = CorpusTest.NVERSES_OT;
+    private static final int IDX_NTEND = CorpusTest.NVERSES_TOTAL - 1;
+
+    // Indices of midpoint verses of the Bible
+    private static final int IDX_MID = (CorpusTest.NVERSES_TOTAL + 1) / 2 - 1;
+    private static final int IDX_OTMID = (CorpusTest.NVERSES_OT + 1) / 2 - 1;
+    private static final int IDX_NTMID = CorpusTest.NVERSES_OT + (CorpusTest.NVERSES_NT + 1) / 2 - 1;
+
     // Bookened verses of the Bible
-    private static final Citation OT_START = new Citation("Genesis", 1, 1);
-    private static final Citation OT_END = new Citation("Malachi", 4, 6);
-    private static final Citation NT_START = new Citation("Matthew", 1, 1);
-    private static final Citation NT_END = new Citation("Revelation", 22, 21);
+    private static final Citation OTSTART = new Citation("Genesis", 1, 1);
+    private static final Citation OTEND = new Citation("Malachi", 4, 6);
+    private static final Citation NTSTART = new Citation("Matthew", 1, 1);
+    private static final Citation NTEND = new Citation("Revelation", 22, 21);
 
     // Midpoint verses of the Bible
-    private static final Citation MIDPOINT = new Citation("Psalms", 103, 1);
-    private static final Citation OT_MIDPOINT = new Citation("2 Chronicles", 18, 30);
-    private static final Citation NT_MIDPOINT = new Citation("Acts", 7, 7);
+    private static final Citation MID = new Citation("Psalms", 103, 1);
+    private static final Citation OTMID = new Citation("2 Chronicles", 18, 30);
+    private static final Citation NTMID = new Citation("Acts", 7, 7);
+
+    public static Stream<Arguments> verseFactory() {
+        return Stream.of(
+            Arguments.of(Translations.Translation.AKJV, "For God so loved the world, that he gave his only begotten Son, that whoever believes in him should not perish, but have everlasting life."),
+            Arguments.of(Translations.Translation.AMPC, "For God so greatly loved and dearly prized the world that He [even] gave up His only begotten ( unique) Son, so that whoever believes in (trusts in, clings to, relies on) Him shall not perish (come to destruction, be lost) but have eternal (everlasting) life."),
+            Arguments.of(Translations.Translation.ASV, "For God so loved the world, that he gave his only begotten Son, that whosoever believeth on him should not perish, but have eternal life."),
+            Arguments.of(Translations.Translation.BSB, "For God so loved the world that He gave His one and only Son, that everyone who believes in Him shall not perish but have eternal life."),
+            Arguments.of(Translations.Translation.CPDV, "For God so loved the world that he gave his only-begotten Son, so that all who believe in him may not perish, but may have eternal life."),
+            Arguments.of(Translations.Translation.DBT, "For God so loved the world, that he gave his only-begotten Son, that whosoever believes on him may not perish, but have life eternal."),
+            Arguments.of(Translations.Translation.DRB, "For God so loved the world, as to give his only begotten Son; that whosoever believeth in him, may not perish, but may have life everlasting."),
+            Arguments.of(Translations.Translation.ERV, "For God so loved the world, that he gave his only begotten Son, that whosoever believeth on him should not perish, but have eternal life."),
+            Arguments.of(Translations.Translation.ESV, "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life."),
+            Arguments.of(Translations.Translation.JPS, "For so greatly did God love the world that He gave His only Son, that every one who trusts in Him may not perish but may have the Life of Ages."),
+            Arguments.of(Translations.Translation.KJV, "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."),
+            Arguments.of(Translations.Translation.NASB, "\"For God so loved the world, that He gave His only begotten Son, that whoever believes in Him shall not perish, but have eternal life."),
+            Arguments.of(Translations.Translation.NET, "For this is the way God loved the world: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life."),
+            Arguments.of(Translations.Translation.SLT, "For God so loved the world, that he gave his only born Son, that every one believing in him perish not, but have eternal life."),
+            Arguments.of(Translations.Translation.WBT, "For God so loved the world, that he gave his only-begotten Son, that whoever believeth in him, should not perish, but have everlasting life."),
+            Arguments.of(Translations.Translation.WEB, "For God so loved the world, that he gave his one and only Son, that whoever believes in him should not perish, but have eternal life."),
+            Arguments.of(Translations.Translation.WEY, "For so greatly did God love the world that He gave His only Son, that every one who trusts in Him may not perish but may have the Life of Ages."),
+            Arguments.of(Translations.Translation.YLT, "for God did so love the world, that His Son—the only begotten—He gave, that every one who is believing in him may not perish, but may have life age-during.")
+        );
+    }
 
     @ParameterizedTest
     @EnumSource(Translations.Translation.class)
@@ -203,46 +241,36 @@ public class CorpusTest {
 
         // Bookend verses of Bible
         Assertions.assertEquals(
-            0, corpus.getIndex(CorpusTest.OT_START), translation.toString()
+            CorpusTest.IDX_OTSTART, corpus.getIndex(CorpusTest.OTSTART), translation.toString()
         );
         Assertions.assertEquals(
-            CorpusTest.NVERSES_OT - 1, corpus.getIndex(CorpusTest.OT_END), translation.toString()
+            CorpusTest.IDX_OTEND, corpus.getIndex(CorpusTest.OTEND), translation.toString()
         );
         Assertions.assertEquals(
-            CorpusTest.NVERSES_OT, corpus.getIndex(CorpusTest.NT_START), translation.toString()
+            CorpusTest.IDX_NTSTART, corpus.getIndex(CorpusTest.NTSTART), translation.toString()
         );
         if (
             translation == Translations.Translation.AMPC
             || translation == Translations.Translation.ESV
         ) {
             Assertions.assertEquals(
-                CorpusTest.NVERSES_TOTAL,
-                corpus.getIndex(CorpusTest.NT_END),
-                translation.toString()
+                CorpusTest.IDX_NTEND + 1, corpus.getIndex(CorpusTest.NTEND), translation.toString()
             );
         } else {
             Assertions.assertEquals(
-                CorpusTest.NVERSES_TOTAL - 1,
-                corpus.getIndex(CorpusTest.NT_END),
-                translation.toString()
+                CorpusTest.IDX_NTEND, corpus.getIndex(CorpusTest.NTEND), translation.toString()
             );
         }
 
         // Midpoint verses of Bible
         Assertions.assertEquals(
-            (CorpusTest.NVERSES_TOTAL + 1) / 2 - 1,
-            corpus.getIndex(CorpusTest.MIDPOINT),
-            translation.toString()
+            CorpusTest.IDX_MID, corpus.getIndex(CorpusTest.MID), translation.toString()
         );
         Assertions.assertEquals(
-            (CorpusTest.NVERSES_OT + 1) / 2 - 1,
-            corpus.getIndex(CorpusTest.OT_MIDPOINT),
-            translation.toString()
+            CorpusTest.IDX_OTMID, corpus.getIndex(CorpusTest.OTMID), translation.toString()
         );
         Assertions.assertEquals(
-            CorpusTest.NVERSES_OT + (CorpusTest.NVERSES_NT + 1) / 2 - 1,
-            corpus.getIndex(CorpusTest.NT_MIDPOINT),
-            translation.toString()
+            CorpusTest.IDX_NTMID, corpus.getIndex(CorpusTest.NTMID), translation.toString()
         );
     }
 
@@ -270,69 +298,111 @@ public class CorpusTest {
         ) {
             exception = Assertions.assertThrows(
                 IllegalArgumentException.class, () -> {
-                    corpus.getCitation(CorpusTest.NVERSES_TOTAL + 1);
+                    corpus.getCitation((CorpusTest.IDX_NTEND + 1) + 1);
                 }, translation.toString()
             );
             Assertions.assertEquals(
                 String.format(
-                    "Invalid verse index: %d", CorpusTest.NVERSES_TOTAL + 1
+                    "Invalid verse index: %d", (CorpusTest.IDX_NTEND + 1) + 1
                 ), exception.getMessage(), translation.toString()
             );
         } else {
             exception = Assertions.assertThrows(
                 IllegalArgumentException.class, () -> {
-                    corpus.getCitation(CorpusTest.NVERSES_TOTAL);
+                    corpus.getCitation(CorpusTest.IDX_NTEND + 1);
                 }, translation.toString()
             );
             Assertions.assertEquals(
                 String.format(
-                    "Invalid verse index: %d", CorpusTest.NVERSES_TOTAL
+                    "Invalid verse index: %d", CorpusTest.IDX_NTEND + 1
                 ), exception.getMessage(), translation.toString()
             );
         }
 
         // Bookend verses of Bible
         Assertions.assertEquals(
-            CorpusTest.OT_START, corpus.getCitation(0), translation.toString()
+            CorpusTest.OTSTART, corpus.getCitation(CorpusTest.IDX_OTSTART), translation.toString()
         );
         Assertions.assertEquals(
-            CorpusTest.OT_END, corpus.getCitation(CorpusTest.NVERSES_OT - 1), translation.toString()
+            CorpusTest.OTEND, corpus.getCitation(CorpusTest.IDX_OTEND), translation.toString()
         );
         Assertions.assertEquals(
-            CorpusTest.NT_START, corpus.getCitation(CorpusTest.NVERSES_OT), translation.toString()
+            CorpusTest.NTSTART, corpus.getCitation(CorpusTest.IDX_NTSTART), translation.toString()
         );
         if (
             translation == Translations.Translation.AMPC
             || translation == Translations.Translation.ESV
         ) {
             Assertions.assertEquals(
-                CorpusTest.NT_END,
-                corpus.getCitation(CorpusTest.NVERSES_TOTAL),
+                CorpusTest.NTEND,
+                corpus.getCitation(CorpusTest.IDX_NTEND + 1),
                 translation.toString()
             );
         } else {
             Assertions.assertEquals(
-                CorpusTest.NT_END,
-                corpus.getCitation(CorpusTest.NVERSES_TOTAL - 1),
+                CorpusTest.NTEND,
+                corpus.getCitation(CorpusTest.IDX_NTEND),
                 translation.toString()
             );
         }
 
         // Midpoint verses of Bible
         Assertions.assertEquals(
-            CorpusTest.MIDPOINT,
-            corpus.getCitation((CorpusTest.NVERSES_TOTAL + 1) / 2 - 1),
-            translation.toString()
+            CorpusTest.MID, corpus.getCitation(CorpusTest.IDX_MID), translation.toString()
         );
         Assertions.assertEquals(
-            CorpusTest.OT_MIDPOINT,
-            corpus.getCitation((CorpusTest.NVERSES_OT + 1) / 2 - 1),
-            translation.toString()
+            CorpusTest.OTMID, corpus.getCitation(CorpusTest.IDX_OTMID), translation.toString()
         );
         Assertions.assertEquals(
-            CorpusTest.NT_MIDPOINT,
-            corpus.getCitation(CorpusTest.NVERSES_OT + (CorpusTest.NVERSES_NT + 1) / 2 - 1),
-            translation.toString()
+            CorpusTest.NTMID, corpus.getCitation(CorpusTest.IDX_NTMID), translation.toString()
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("verseFactory")
+    void testGetText(Translations.Translation translation, String text) {
+        Exception exception;
+
+        Corpus corpus = Corpus.getInstance(translation);
+
+        // Upper bound of valid index range exceeded
+        if (
+            translation == Translations.Translation.AMPC
+            || translation == Translations.Translation.ESV
+        ) {
+            exception = Assertions.assertThrows(
+                IllegalArgumentException.class, () -> {
+                    corpus.getText((CorpusTest.IDX_NTEND + 1) + 1);
+                }, translation.toString()
+            );
+            Assertions.assertEquals(
+                String.format(
+                    "Invalid verse index: %d", (CorpusTest.IDX_NTEND + 1) + 1
+                ), exception.getMessage(), translation.toString()
+            );
+        } else {
+            exception = Assertions.assertThrows(
+                IllegalArgumentException.class, () -> {
+                    corpus.getText(CorpusTest.IDX_NTEND + 1);
+                }, translation.toString()
+            );
+            Assertions.assertEquals(
+                String.format(
+                    "Invalid verse index: %d", CorpusTest.IDX_NTEND + 1
+                ), exception.getMessage(), translation.toString()
+            );
+        }
+
+        Assertions.assertNotNull(corpus.getText(CorpusTest.IDX_OTSTART), translation.toString());
+        Assertions.assertNotNull(corpus.getText(CorpusTest.IDX_OTEND), translation.toString());
+        Assertions.assertNotNull(corpus.getText(CorpusTest.IDX_NTSTART), translation.toString());
+        Assertions.assertNotNull(corpus.getText(CorpusTest.IDX_NTEND), translation.toString());
+        Assertions.assertNotNull(corpus.getText(CorpusTest.IDX_MID), translation.toString());
+        Assertions.assertNotNull(corpus.getText(CorpusTest.IDX_OTMID), translation.toString());
+        Assertions.assertNotNull(corpus.getText(CorpusTest.IDX_NTMID), translation.toString());
+
+        Assertions.assertEquals(
+            text, corpus.getText(new Citation("John", 3, 16)), translation.toString()
         );
     }
 }
