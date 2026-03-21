@@ -172,6 +172,92 @@ _Note_: The books of Obadiah, Philemon, 2 John, 3 John, and Jude comprise only a
 
 *Citation-Baseed Verse Retrieval*. If the system is provided a valid biblical citation of a verse within Scripture, then the system shall be able to retrieve the text of the corresponding verse and its zero-based index within Scripture; if the system is provided with an invalid index, then the system shall enter an erroneous state.
 
+#### 3.1.2 Core Gameplay
+
+##### FR-CORE-001
+
+*Session Configuration: Session Length*. The system shall enable the user to configure the number of rounds that comprise a session. The system shall allow the user to set the session length to any of the values listed in the following table. By default, the system shall set the session length to **5**, as listed in the following table.
+
+| Supported Values | Default Value |
+| :--- | :---: |
+| 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100 | 5 |
+
+##### FR-CORE-002
+
+*Session Configuration: Bible Translation*. The system shall enable the user to configure the Bible translation to be used throughout the duration of a session. The system shall allow the user to set the Bible translation used to any of the supported translations listed in [FR-PARSE-003](#fr-parse-003). By default, the system shall set the Bible translation used to the **English Standard Version (ESV)**.
+
+##### FR-CORE-003
+
+*Session Configuration: Time Limit*. The system shall enable the user to configure the maximum amount of time the user is allotted for each round of a session. The system shall allow the user to set the time limit to a multiple of 15 seconds between 0 seconds and 600 seconds, inclusive. If the user sets the time limit to 0 seconds, then the system shall not impose a time limit. By default, the system shall set the time limit to **0 seconds**.
+
+##### FR-CORE-004
+
+*Session Configuration: Scope*. The system shall enable the user to configure the scope of the Bible to be used throughout the duration of a session. The system shall allow the user to set the scope to any non-trivial subset of the set of books that comprise the Biblical canon. By default, the system shall set the scope to the entire Biblical canon.
+
+##### FR-CORE-005
+
+*Session Configuration: Visibility*. The system shall enable the user to configure the number of verses of context that are included alongside the target verse for each round throughout the duration of a session. The system shall allow the user to set the visibility to any of the values listed in the following table. By default, the system shall set the visibility to **10**, as listed in the following table.
+
+| Supported Values | Default Value |
+| :--- | :---: |
+| 0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100 | 10 |
+
+##### FR-CORE-007
+
+*Target Verse Selection*. At the start of each round of a session, the system shall randomly select a target verse from the scope of Scripture set for the session (see [FR-CORE-004](#fr-core-004)) according to a uniform distribution.
+
+##### FR-CORE-008
+
+*Round Number Presentation*. Throughout the duration of each round of a session, the system shall display the one-based index of the round within the session and the total number of rounds comprising the session (see [FR-CORE-001](#fr-core-001)).
+
+##### FR-CORE-009
+
+*Timer Presentation*. Throughout the duration of each round of a session, the system shall display the amount of time remaining for the round if a timer was set for the session (see [FR-CORE-003](#fr-core-003)).
+
+##### FR-CORE-010
+
+*Passage Presentation*. Throughout the duration of a given round of a session, the system shall display the target passage:
+
+Let $n$ be the number of verses in the corpus of Scripture and $S = ({s}_{0}, \dots, {s}_{n - 1})$ denote the corpus of Scripture. Let $i$, $a$, and $b$ be the zero-based indices of the target verse, the first verse of the target passage, and the last verse of the target passage, respectively, within the corpus of Scripture and $X = ({s}_{a}, {s}_{a + 1}, \dots, {s}_{i - 1}, {s}_{i}, {s}_{i + 1}, \dots, {s}_{b - 1}, {s}_{b})$ denote the target passage. If $k$ is taken to be the visibility set for the session (see [FR-CORE-005](#fr-core-005)), then $a = \max(0, i - k)$ and $b = \min(i + k, n - 1)$.
+
+##### FR-CORE-011
+
+*Guess Submission*. The system shall prompt the user to submit a biblical citation (see [FR-PARSE-004](#fr-parse-004)) of their guess of the location of the target verse.
+
+##### FR-CORE-012
+
+*Submission Scoring*. The system shall score a given submission on a integral scale from 0 points to 100 points, inclusive, according to the absolute distance between the submitted verse and the target verse, with the following constraints:
+- The system shall award the submission 100 points if and only if the submitted verse exactly matches the target verse.
+
+##### FR-CORE-013
+
+*Submission Rating*. The system shall rate a given submission on an integral scale from 0 to 3 stars, inclusive, based on the correctness of the submitted verse:
+- The system shall award the submission one star if the book of the submitted verse matches the book of the target verse.
+- The system shall award the submission an additional second star if the chapter number of the submitted verse matches the chapter number of the target verse.
+- The system shall award the submission an additional third star if the verse number of the submitted verse matches the verse number of the target verse.
+
+The following table enumerates the correctness of a given submission and the corresponding rating of the submission.
+
+| Book | Chapter | Verse | Rating |
+| :---: | :---: | :---: | :---: |
+| Incorrect | Incorrect | Incorrect | 0 stars |
+| Incorrect | Incorrect | Correct | 0 stars |
+| Incorrect | Correct | Incorrect | 0 stars |
+| Incorrect | Correct | Correct | 0 stars |
+| Correct | Incorrect | Incorrect | 1 star |
+| Correct | Incorrect | Correct | 1 star |
+| Correct | Correct | Incorrect | 2 stars |
+| Correct | Correct | Correct | 3 stars |
+
+##### FR-CORE-014
+
+*Target Verse Reveal*. Following a user submission, the system shall display each of the following items:
+- The target passage (see [FR-CORE-010](#fr-core-010))
+- The citation of the target verse (see [FR-PARSE-004](#fr-parse-004), [FR-CORE-007](#fr-core-007))
+- The citation of the submitted verse (see [FR-PARSE-004](#fr-parse-004), [FR-CORE-011](#fr-core-011))
+- The score of the submitted verse (see [FR-CORE-012](#fr-core-012))
+- The rating of the submitted verse (see [FR-CORE-013](#fr-core-013))
+
 ### 3.2 Non-Functional Requirements
 
 #### 3.2.1 Performance
