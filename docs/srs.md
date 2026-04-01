@@ -180,7 +180,7 @@ _Note_: The books of Obadiah, Philemon, 2 John, 3 John, and Jude comprise only a
 
 | Supported Values | Default Value |
 | :--- | :---: |
-| 1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 75, 100 | 5 |
+| 1, 2, 3, 4, 5, 10, 15, 20, 25 | 5 |
 
 ##### FR-CORE-002
 
