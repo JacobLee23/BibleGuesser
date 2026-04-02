@@ -48,7 +48,7 @@ public class Session {
      */
     public void run() {
         for (int i = 1; i <= this.configurations.length; ++i) {
-            Round round = new Round();
+            Round round = new Round(i);
             this.rounds.add(round);
 
             round.run();
@@ -259,12 +259,29 @@ public class Session {
      * Models a single round of a session.
      */
     private class Round {
+        // Total character-width of display
+        private static final int LINE_WIDTH = 80;
+
+        // Characters for padding the display
+        private static final char PADDING = ' ';
+        private static final char FILLCHAR = '=';
+
+        private final int number;
+
         private final Timer timer;
 
         /**
          * Initializes a single round of a session.
+         *
+         * @param number
          */
-        public Round() {
+        public Round(int number) {
+            if (number <= 0 || number > Session.this.configurations.length) {
+                throw new IllegalArgumentException(
+                    String.format("Invalid round number: %d", number)
+                );
+            }
+            this.number = number;
             if (Session.this.configurations.tlimit == 0) {
                 this.timer = null;
             } else {
@@ -276,10 +293,25 @@ public class Session {
          * Runs the round to completion.
          */
         public void run() {
+            System.out.println(this.formatRound());
             if (timer != null) {
                 this.timer.run();
                 while (!this.timer.update()) {}
             }
+        }
+
+        private String formatRound() {
+            String round = String.format(
+                "%cRound %d/%d%c", Round.PADDING, this.number, Session.this.configurations.length,
+                Round.PADDING
+            );
+            int pad = Round.LINE_WIDTH - round.length();
+            int lpad = pad / 2;
+            int rpad = pad - lpad;
+            String lpadding = String.valueOf(Round.FILLCHAR).repeat(lpad);
+            String rpadding = String.valueOf(Round.FILLCHAR).repeat(rpad);
+
+            return lpadding + round + rpadding;
         }
     }
 }
