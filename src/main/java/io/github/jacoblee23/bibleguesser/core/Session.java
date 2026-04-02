@@ -239,4 +239,22 @@ public class Session {
             this.visibility = visibility;
         }
     }
+
+    /**
+     * Models a single round of a session.
+     */
+    public class Round {
+        private final Timer timer;
+
+        /**
+         * Initializes a single round of a session.
+         */
+        public Round() {
+            if (Session.this.configurations.tlimit == 0) {
+                this.timer = null;
+            } else {
+                this.timer = new Timer(Session.this.configurations.tlimit);
+            }
+        }
+    }
 }
