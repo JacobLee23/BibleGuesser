@@ -14,6 +14,7 @@ import io.github.jacoblee23.bibleguesser.scriptures.Translations;
  */
 public class Session {
     private final Configurations configurations;
+    private final List<Round> rounds;
 
     /**
      * Initializes a session with the specified configurations.
@@ -22,6 +23,7 @@ public class Session {
      */
     public Session(Configurations configurations) {
         this.configurations = configurations;
+        this.rounds = new ArrayList<>();
     }
 
     /**
@@ -29,6 +31,7 @@ public class Session {
      */
     public Session() {
         this.configurations = new Configurations();
+        this.rounds = new ArrayList<>();
     }
 
     /**
@@ -38,6 +41,18 @@ public class Session {
      */
     public Configurations getConfigurations() {
         return this.configurations;
+    }
+
+    /**
+     * Runs the session to completion.
+     */
+    public void run() {
+        for (int i = 1; i <= this.configurations.length; ++i) {
+            Round round = new Round();
+            this.rounds.add(round);
+
+            round.run();
+        }
     }
 
     /**
@@ -243,7 +258,7 @@ public class Session {
     /**
      * Models a single round of a session.
      */
-    public class Round {
+    private class Round {
         private final Timer timer;
 
         /**
@@ -254,6 +269,16 @@ public class Session {
                 this.timer = null;
             } else {
                 this.timer = new Timer(Session.this.configurations.tlimit);
+            }
+        }
+
+        /**
+         * Runs the round to completion.
+         */
+        public void run() {
+            if (timer != null) {
+                this.timer.run();
+                while (!this.timer.update()) {}
             }
         }
     }

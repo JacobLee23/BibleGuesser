@@ -154,12 +154,13 @@ public class Timer {
         if (!(this.start == null && this.end == null)) {
             throw new IllegalStateException("Timer has not been reset to its initial state");
         }
-        this.start = Instant.now();
-        this.end = this.start.plus(this.duration);
 
         if (!this.muted) {
             this.display();
         }
+
+        this.start = Instant.now();
+        this.end = this.start.plus(this.duration);
     }
 
     /**
