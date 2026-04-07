@@ -3,9 +3,11 @@ package io.github.jacoblee23.bibleguesser.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import io.github.jacoblee23.bibleguesser.scriptures.Canon;
+import io.github.jacoblee23.bibleguesser.scriptures.Corpus;
 import io.github.jacoblee23.bibleguesser.scriptures.Translations;
 
 
@@ -47,7 +49,18 @@ public class Session {
      * Runs the session to completion.
      */
     public void run() {
+        // Load corpus of Scripture based on translation
+        Corpus corpus = Corpus.getInstance(this.configurations.translation);
+        int nverses = 0;
+        for (String book : Session.this.configurations.scope) {
+            nverses += corpus.nverses(book);
+        }
+
+        Random random = new Random();
         for (int i = 1; i <= this.configurations.length; ++i) {
+            // Select target verse
+            int target = random.nextInt(nverses - 1);
+
             Round round = new Round(i);
             this.rounds.add(round);
 
