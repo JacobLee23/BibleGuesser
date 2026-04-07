@@ -218,7 +218,7 @@ _Note_: The books of Obadiah, Philemon, 2 John, 3 John, and Jude comprise only a
 
 *Passage Presentation*. Throughout the duration of a given round of a session, the system shall display the target passage:
 
-Let $n$ be the number of verses in the corpus of Scripture and $S = ({s}_{0}, \dots, {s}_{n - 1})$ denote the corpus of Scripture. Let $i$, $a$, and $b$ be the zero-based indices of the target verse, the first verse of the target passage, and the last verse of the target passage, respectively, within the corpus of Scripture and $X = ({s}_{a}, {s}_{a + 1}, \dots, {s}_{i - 1}, {s}_{i}, {s}_{i + 1}, \dots, {s}_{b - 1}, {s}_{b})$ denote the target passage. If $k$ is taken to be the visibility set for the session (see [FR-CORE-005](#fr-core-005)), then $a = \max(0, i - k)$ and $b = \min(i + k, n - 1)$.
+Let $n$ be the number of verses in the corpus of Scripture and $S = ({s}\_{0}, \dots, {s}\_{n - 1})$ denote the corpus of Scripture. Let $i$, $a$, and $b$ be the zero-based indices of the target verse, the first verse of the target passage, and the last verse of the target passage, respectively, within the corpus of Scripture and $X = ({s}\_{a}, {s}\_{a + 1}, \dots, {s}\_{i - 1}, {s}\_{i}, {s}\_{i + 1}, \dots, {s}\_{b - 1}, {s}\_{b})$ denote the target passage. If $k$ is taken to be the visibility set for the session (see [FR-CORE-005](#fr-core-005)), then $a = \max(0, i - k)$ and $b = \min(i + k, n - 1)$.
 
 ##### FR-CORE-011
 
