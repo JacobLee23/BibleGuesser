@@ -2,7 +2,7 @@ package io.github.jacoblee23.bibleguesser.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.time.Instant;
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.IntStream;
 
@@ -12,9 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 
 public class TimerTest {
-    // Timer accuracy (ms)
-    private static final int TOLERANCE = 5;
-
     public static IntStream durationFactory() {
         return IntStream.of(-1, 0, 1, 2, 3);
     }
@@ -42,48 +39,50 @@ public class TimerTest {
 
         // Verify initial state of timer
         Assertions.assertEquals(duration, timer.getDuration().getSeconds());
-        Assertions.assertEquals(timer.getDuration(), timer.getRemaining());
         Assertions.assertNull(timer.getStart());
         Assertions.assertNull(timer.getEnd());
+        Assertions.assertEquals(timer.getDuration(), timer.getRemaining());
 
         System.setOut(out);
         timer.run();
         System.setOut(stdout);
 
         // Verify running state of timer
-        Assertions.assertTrue(
-            timer.getRemaining().getSeconds() <= timer.getDuration().getSeconds()
-        );
+        Assertions.assertNotEquals(Duration.ZERO, timer.getRemaining());
         Assertions.assertNotNull(timer.getStart());
         Assertions.assertNotNull(timer.getEnd());
-        Assertions.assertEquals(
-            timer.getDuration().toSeconds(),
-            timer.getStart().until(timer.getEnd(), ChronoUnit.SECONDS)
+        Assertions.assertEquals(timer.getEnd(), timer.getStart().plus(timer.getDuration()));
+
+        // Verify timer display
+        Assertions.assertTrue(
+            buffer.toString().contains(String.valueOf(Timer.UNCONSUMED).repeat(Timer.LINE_WIDTH))
         );
+        Assertions.assertTrue(
+            buffer.toString().contains(String.format("%02d:%02d.000", duration / 60, duration % 60))
+        );
+        buffer.reset();
 
-        long remainder = Instant.now().until(timer.getEnd(), ChronoUnit.MILLIS);
-        try {
-            Thread.sleep(remainder - TimerTest.TOLERANCE);
-        } catch (InterruptedException e) {
-            Assertions.fail();
+        // Exhaust timer
+        while (true) {
+            System.setOut(out);
+            Duration remaining = timer.update();
+            System.setOut(stdout);
+
+            if (remaining == Duration.ZERO) {
+                break;
+            }
+            buffer.reset();
         }
 
-        System.setOut(out);
-        Assertions.assertFalse(timer.update());
-        System.setOut(stdout);
-
-        try {
-            Thread.sleep(2 * TimerTest.TOLERANCE);
-        } catch (InterruptedException e) {
-            Assertions.fail();
-        }
-
-        System.setOut(out);
-        Assertions.assertTrue(timer.update());
-        System.setOut(stdout);
+        // Verify timer display
+        Assertions.assertTrue(
+            buffer.toString().contains(String.valueOf(Timer.CONSUMED).repeat(Timer.LINE_WIDTH))
+        );
+        Assertions.assertTrue(buffer.toString().contains("00:00.000"));
+        buffer.reset();
 
         // Verify completed state of timer
-        Assertions.assertEquals(0, timer.getRemaining().getSeconds());
+        Assertions.assertEquals(Duration.ZERO, timer.getRemaining());
         Assertions.assertNotNull(timer.getStart());
         Assertions.assertNotNull(timer.getEnd());
         Assertions.assertEquals(

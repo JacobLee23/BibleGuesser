@@ -10,24 +10,21 @@ import java.time.temporal.ChronoUnit;
  */
 public class Timer {
     // Total character-width of display
-    private static final int LINE_WIDTH = 80;
+    protected static final int LINE_WIDTH = 80;
 
     // Characters for designating the consumed/unconsumed portions of the bar display
-    private static final char CONSUMED = '\u2591';
-    private static final char UNCONSUMED = '\u2588';
+    protected static final char CONSUMED = '\u2591';
+    protected static final char UNCONSUMED = '\u2588';
 
     // Characters for padding the time display
-    private static final char PADDING = ' ';
-    private static final char FILLCHAR = '-';
+    protected static final char PADDING = ' ';
+    protected static final char FILLCHAR = '-';
 
     // Flag to mute the timer display
     private boolean muted;
 
     // Total timer duration
     private final Duration duration;
-
-    // Remaining timer duration
-    private Duration remaining;
 
     // Timer start/end time
     private Instant start;
@@ -46,7 +43,6 @@ public class Timer {
             );
         }
         this.duration = duration;
-        this.remaining = Duration.from(this.duration);
         this.start = null;
         this.end = null;
 
@@ -79,13 +75,6 @@ public class Timer {
      */
     public Timer(int duration) {
         this(duration, false);
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-            "%02d:%02d", this.remaining.getSeconds() / 60, this.remaining.getSeconds() % 60
-        );
     }
 
     /**
@@ -121,15 +110,6 @@ public class Timer {
     }
 
     /**
-     * Retrieves the remaining duration of the timer.
-     *
-     * @return The remaining duration of the timer
-     */
-    public Duration getRemaining() {
-        return Duration.from(this.remaining);
-    }
-
-    /**
      * Retrieves the starting time of the timer.
      *
      * @return The starting time of the timer
@@ -148,16 +128,27 @@ public class Timer {
     }
 
     /**
+     * Retrieves the remaining duration of the timer.
+     *
+     * @return The remaining duration of the timer
+     */
+    public Duration getRemaining() {
+        if (this.end == null) {
+            return Duration.from(this.duration);
+        }
+        long remaining = Instant.now().until(this.end, ChronoUnit.MILLIS);
+
+        return Duration.ofMillis((remaining <= 0) ? 0 : remaining);
+    }
+
+    /**
      * Runs the timer.
      */
     public void run() {
         if (!(this.start == null && this.end == null)) {
             throw new IllegalStateException("Timer has not been reset to its initial state");
         }
-
-        if (!this.muted) {
-            this.display();
-        }
+        this.display();
 
         this.start = Instant.now();
         this.end = this.start.plus(this.duration);
@@ -169,29 +160,30 @@ public class Timer {
      *
      * @return Whether the timer has completed
      */
-    public boolean update() {
-        Instant instant = Instant.now();
-        if (instant.isAfter(this.end)) {
-            return true;
-        }
-
-        this.remaining = Duration.ofSeconds(instant.until(this.end, ChronoUnit.SECONDS));
-        
+    public Duration update() {
+        Duration remaining = this.getRemaining();
         if (!this.muted) {
             System.out.print("\u001B[2A\r");    // Position cursor to overwrite display
             this.display();
         }
-
-        return false;
+        return remaining;
     }
 
     /**
      * Resets the timer to its initial state.
      */
     public void reset() {
-        this.remaining = Duration.from(this.duration);
         this.start = null;
         this.end = null;
+    }
+
+    public String print() {
+        Duration remaining = this.getRemaining();
+        long minutes = remaining.getSeconds() / 60;
+        long seconds = remaining.getSeconds() % 60;
+        long milliseconds = remaining.getNano() / 1000000;
+
+        return String.format("%02d:%02d.%03d", minutes, seconds, milliseconds);
     }
 
     private void display() {
@@ -200,7 +192,8 @@ public class Timer {
     }
 
     private String formatBar() {
-        float ratio = (float) this.remaining.getSeconds() / this.duration.getSeconds();
+        Duration remaining = this.getRemaining();
+        float ratio = (float) remaining.getSeconds() / this.duration.getSeconds();
         String consumed = String.valueOf(Timer.CONSUMED).repeat(
             Math.round((1 - ratio) * Timer.LINE_WIDTH)
         );
@@ -212,7 +205,7 @@ public class Timer {
     }
 
     private String formatTime() {
-        String time = String.format("%c%s%c", Timer.PADDING, this.toString(), Timer.PADDING);
+        String time = String.format("%c%s%c", Timer.PADDING, this.print(), Timer.PADDING);
         int pad = Timer.LINE_WIDTH - time.length();
         int lpad = pad / 2;
         int rpad = pad - lpad;
